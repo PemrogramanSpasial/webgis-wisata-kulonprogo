@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,6 +7,71 @@
 
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Gaya tambahan untuk fitur rekomendasi (SAW) -->
+    <style>
+        .lokasi-aksi { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .info-lokasi { margin-top: 10px; font-size: 14px; color: #374151; min-height: 18px; }
+        .info-lokasi.galat { color: #b91c1c; }
+
+        #bannerPeta {
+            display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            z-index: 1250; background: #1f2937; color: #fff; padding: 10px 16px;
+            border-radius: 6px; font-size: 14px;
+        }
+
+        #loading {
+            display: none; position: fixed; inset: 0; z-index: 1300;
+            align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.75); font-size: 16px; color: #1f2937;
+        }
+
+        .marker-nomor span {
+            display: flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 50%;
+            background: #c2410c; color: #fff; font-weight: 700; font-size: 15px;
+            border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        #hasil {
+            display: none; position: fixed; z-index: 1200;
+            top: 90px; right: 12px; bottom: 12px; width: 360px; max-width: calc(100vw - 24px);
+            background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+            overflow-y: auto; font-size: 14px; color: #1f2937;
+        }
+        .hasil-kepala {
+            position: sticky; top: 0; background: #fff; z-index: 1;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 14px; border-bottom: 1px solid #e5e7eb;
+        }
+        .hasil-kepala h2 { margin: 0; font-size: 17px; }
+        #hasilIsi { padding: 12px 14px 16px; }
+        .ringkas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .ringkas div { background: #f3f4f6; border-radius: 6px; padding: 8px 10px; }
+        .ringkas span { display: block; font-size: 12px; color: #6b7280; }
+        .catatan { background: #fef3c7; border-radius: 6px; padding: 8px 10px; margin: 8px 0; }
+        .hasil-kosong { color: #b91c1c; }
+        .daftar-stop { list-style: none; margin: 12px 0 0; padding: 0; }
+        .stop { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid #e5e7eb; cursor: pointer; }
+        .stop-no {
+            flex: none; width: 28px; height: 28px; border-radius: 50%;
+            background: #c2410c; color: #fff; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .stop-nama { font-weight: 700; }
+        .stop-kat, .stop-skor { font-size: 12px; color: #6b7280; }
+        .stop-baris { margin-top: 3px; }
+        .badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; margin-right: 6px; }
+        .badge.buka { background: #dcfce7; color: #166534; }
+        .badge.tutup { background: #fee2e2; color: #991b1b; }
+        .badge.tak-ada { background: #e5e7eb; color: #374151; }
+        .pulang { margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e7eb; }
+        .bobot { font-size: 12px; color: #6b7280; }
+
+        @media (max-width: 640px) {
+            #hasil { top: auto; left: 12px; right: 12px; width: auto; max-width: none; height: 55vh; bottom: 12px; }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -19,6 +83,21 @@
     <main>
         <div id="map"></div>
     </main>
+
+    <!-- Petunjuk saat memilih titik awal di peta -->
+    <div id="bannerPeta">Klik di peta untuk menentukan lokasi awal</div>
+
+    <!-- Indikator proses perhitungan -->
+    <div id="loading">Menyusun rencana perjalanan...</div>
+
+    <!-- Hasil rekomendasi -->
+    <aside id="hasil">
+        <div class="hasil-kepala">
+            <h2>Rencana Perjalanan</h2>
+            <button id="btnTutupHasil" type="button">Tutup</button>
+        </div>
+        <div id="hasilIsi"></div>
+    </aside>
 
     <section id="panduan" class="panduan">
         <div class="panduan-card">
@@ -42,6 +121,7 @@
 
     <script src="vendor/leaflet/leaflet.js"></script>
     <script src="data/data.js"></script>
+    <script src="js/saw.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
